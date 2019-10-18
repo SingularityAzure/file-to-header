@@ -43,18 +43,6 @@ int main(int argumentCount, char** arguments) {
         return 0;
     }
 
-    int warnSpace = 0;
-    for (int i = 0; arguments[2][i] != 0; i++) {
-        if (arguments[2][i] == ' ') {
-            arguments[2][i] = '_';
-            warnSpace = 1;
-        }
-    }
-    if (warnSpace) {
-        printf("Warning: Output filename has spaces. "
-            "Spaces will be replaced with underscores in the array name.\n");
-    }
-
     FILE *fileIn = fopen(arguments[1], "rb");
     if (!fileIn) {
         printf("Failed to open %s for reading.\n", arguments[1]);
@@ -84,12 +72,31 @@ int main(int argumentCount, char** arguments) {
     }
     fclose(fileIn);
 
+    // Get rid of any directory listings
+    for (int i = 0; arguments[2][i] != 0; i++) {
+        if (arguments[2][i] == '/' || arguments[2][i] == '\\') {
+            arguments[2] += i+1;
+            i = 0;
+        }
+    }
     // Get rid of the ".c" for the array name
     for (int i = 0; arguments[2][i] != 0; i++) {
         if (arguments[2][i] == '.') {
             arguments[2][i] = 0;
             break;
         }
+    }
+
+    int warnSpace = 0;
+    for (int i = 0; arguments[2][i] != 0; i++) {
+        if (arguments[2][i] == ' ') {
+            arguments[2][i] = '_';
+            warnSpace = 1;
+        }
+    }
+    if (warnSpace) {
+        printf("Warning: Output filename has spaces. "
+            "Spaces will be replaced with underscores in the array name.\n");
     }
 
     fprintf(fileOut,
